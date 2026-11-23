@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Reporte General - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT DEL PANEL ADMINISTRADOR -->
+    <div class="layout-wrapper">
+        <!-- SIDEBAR DE NAVEGACIÓN -->
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4>ADMINISTRADOR</h4>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item active"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoria</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <div class="view-header">
+                <div class="view-header-title">
+                    <div>
+                        <h2>REPORTE GENERAL</h2>
+                        <p>Resumen general de ventas y movimientos del negocio.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <form id="reporte-filtros-fechas" class="report-date-filters table-data-card" onsubmit="filtrarReporteGeneral(event)" aria-label="Filtrar ventas por fecha">
+                <div class="report-date-fields">
+                    <label for="rep-gen-f-inicio">Desde
+                        <input type="date" id="rep-gen-f-inicio" name="desde" class="filter-input" aria-describedby="rep-gen-fechas-error" oninput="limpiarErrorFechasReporte()">
+                    </label>
+                    <label for="rep-gen-f-fin">Hasta
+                        <input type="date" id="rep-gen-f-fin" name="hasta" class="filter-input" aria-describedby="rep-gen-fechas-error" oninput="limpiarErrorFechasReporte()">
+                    </label>
+                </div>
+                <div class="report-date-actions">
+                    <button type="submit" class="btn-primary-action"><i class="fa-solid fa-filter" aria-hidden="true"></i> Aplicar fechas</button>
+                    <button type="button" class="btn-table-action" onclick="limpiarFechasReporteGeneral()">Ver todo</button>
+                </div>
+                <p id="rep-gen-fechas-error" class="inline-form-error" role="alert" hidden></p>
+            </form>
+
+            <!-- TARJETAS DE INDICADORES (KPIs) -->
+            <div class="kpi-cards-grid">
+                <!-- Ventas Totales -->
+                <div class="kpi-card">
+                    <div class="kpi-card-body">
+                        <div class="kpi-icon-box pink">
+                            <i class="fa-solid fa-bag-shopping"></i>
+                        </div>
+                        <div class="kpi-data-col">
+                            <small>VENTAS TOTALES</small>
+                            <h3 id="kpi-ventas-totales">S/ 0.00</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card-footer">
+                        <span>Estado en tiempo real</span>
+                        <span class="trend-up"><i class="fa-solid fa-circle-check"></i> Activo</span>
+                    </div>
+                </div>
+
+                <!-- Total Boletas -->
+                <div class="kpi-card">
+                    <div class="kpi-card-body">
+                        <div class="kpi-icon-box blue">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div class="kpi-data-col">
+                            <small>TOTAL BOLETAS</small>
+                            <h3 id="kpi-total-boletas">0</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card-footer">
+                        <span>Registros emitidos</span>
+                        <span class="trend-up"><i class="fa-solid fa-database"></i> SQL</span>
+                    </div>
+                </div>
+
+                <!-- Ticket Promedio -->
+                <div class="kpi-card">
+                    <div class="kpi-card-body">
+                        <div class="kpi-icon-box green">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="kpi-data-col">
+                            <small>TICKET PROMEDIO</small>
+                            <h3 id="kpi-ticket-promedio">S/ 0.00</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card-footer">
+                        <span>Promedio por cliente</span>
+                        <span class="trend-up"><i class="fa-solid fa-calculator"></i> Calculado</span>
+                    </div>
+                </div>
+
+                <!-- Anuladas / Modificadas -->
+                <div class="kpi-card">
+                    <div class="kpi-card-body">
+                        <div class="kpi-icon-box purple">
+                            <i class="fa-solid fa-box-archive"></i>
+                        </div>
+                        <div class="kpi-data-col">
+                            <small>ANULADAS / MODIFICADAS</small>
+                            <h3 id="kpi-anuladas-cant">0</h3>
+                        </div>
+                    </div>
+                    <div class="kpi-card-footer">
+                        <span>Boletas ajustadas</span>
+                        <span class="trend-down" id="kpi-anuladas-desc"><i class="fa-solid fa-check"></i> 0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECCIÓN MEDIA: GRÁFICO DÍA POR DÍA Y RESUMEN DEL PERIODO -->
+            <div class="middle-report-grid">
+                <!-- GRÁFICO DINÁMICO -->
+                <div class="chart-report-card">
+                    <div class="chart-card-header">
+                        <h4>VENTAS DÍA POR DÍA</h4>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: var(--primary-pink);">Últimos 7 días</span>
+                    </div>
+
+                    <div class="svg-chart-container" id="chart-dynamic-wrapper">
+                        <!-- Generado con script.js -->
+                    </div>
+                </div>
+
+                <!-- RESUMEN DEL PERIODO (CON EFECTIVO COMBINADO) -->
+                <div class="period-summary-card">
+                    <h4>RESUMEN DEL PERIODO</h4>
+
+                    <div class="period-items-list">
+                        <!-- Efectivo -->
+                        <div class="period-item-row">
+                            <div class="method-badge-info">
+                                <div class="method-mini-icon green">
+                                    <i class="fa-solid fa-money-bill-wave"></i>
+                                </div>
+                                <span>Efectivo</span>
+                            </div>
+                            <strong id="resumen-periodo-efectivo">S/ 0.00</strong>
+                            <span class="pct-badge" id="pct-periodo-efectivo">0.00%</span>
+                        </div>
+
+                        <!-- Yape -->
+                        <div class="period-item-row">
+                            <div class="method-badge-info">
+                                <div class="method-mini-icon purple">
+                                    <span style="font-weight: 900; font-size: 0.75rem;">Y</span>
+                                </div>
+                                <span>Yape</span>
+                            </div>
+                            <strong id="resumen-periodo-yape">S/ 0.00</strong>
+                            <span class="pct-badge" id="pct-periodo-yape">0.00%</span>
+                        </div>
+
+                        <!-- Combinado (Reemplaza a Plin) -->
+                        <div class="period-item-row">
+                            <div class="method-badge-info">
+                                <div class="method-mini-icon cyan">
+                                    <i class="fa-solid fa-cash-register" style="font-size: 0.75rem;"></i>
+                                </div>
+                                <span>Combinado</span>
+                            </div>
+                            <strong id="resumen-periodo-combinado">S/ 0.00</strong>
+                            <span class="pct-badge" id="pct-periodo-combinado">0.00%</span>
+                        </div>
+
+                        <!-- P.O.S -->
+                        <div class="period-item-row">
+                            <div class="method-badge-info">
+                                <div class="method-mini-icon blue">
+                                    <i class="fa-solid fa-credit-card"></i>
+                                </div>
+                                <span>P.O.S</span>
+                            </div>
+                            <strong id="resumen-periodo-pos">S/ 0.00</strong>
+                            <span class="pct-badge" id="pct-periodo-pos">0.00%</span>
+                        </div>
+                    </div>
+
+                    <div class="period-total-row">
+                        <span>TOTAL</span>
+                        <strong id="resumen-periodo-total">S/ 0.00</strong>
+                        <span class="pct-badge full">100%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTE DETALLADO -->
+            <div class="table-data-card" style="margin-top: 25px;">
+                <div class="detalle-boletas-header">
+                    <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800;">REPORTE DETALLADO</h4>
+                </div>
+
+                <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                    <table class="custom-table sales-summary-table">
+                        <thead>
+                            <tr>
+                                <th>Nº Boleta</th>
+                                <th>Fecha</th>
+                                <th>Cajero</th>
+                                <th>Caja</th>
+                                <th>Método de Pago</th>
+                                <th>Monto (S/)</th>
+                                <th>Estado</th>
+                                <th class="sale-detail-column">Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-reporte-general-body">
+                            <!-- Llenado con datos de PostgreSQL -->
+                        </tbody>
+    </table>
+                </div>
+
+                <div class="table-pagination-footer">
+                    <span id="label-paginacion-reporte-general" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                        Mostrando 0 boletas
+                    </span>
+                    <div class="pagination-buttons">
+                        <span id="pagina-reporte-general-actual" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;"></span>
+                        <button type="button" id="btn-pag-reporte-general-anterior" class="btn-page">&laquo; Anterior</button>
+                        <button type="button" id="btn-pag-reporte-general-siguiente" class="btn-page">Siguiente &raquo;</button>
+                    </div>
+                </div>
+            </div>
+            <section id="catalogo-dashboard" class="catalogo-dashboard" aria-labelledby="catalogo-dashboard-title">
+                <div class="chart-card-header"><div><h3 id="catalogo-dashboard-title">VENTAS POR CATEGORÍA Y PRODUCTO</h3><p id="catalogo-dashboard-periodo">El mismo período seleccionado en el reporte.</p></div></div>
+                <p id="catalogo-dashboard-estado" role="status" aria-live="polite">Cargando estadísticas…</p>
+                <div id="catalogo-dashboard-datos" hidden>
+                    <div class="catalogo-kpis">
+                        <div class="table-data-card"><span>Ingresos del período</span><strong id="catalogo-ingresos">S/ 0.00</strong></div>
+                        <div class="table-data-card"><span>Unidades vendidas</span><strong id="catalogo-unidades">0</strong></div>
+                        <div class="table-data-card"><span>Producto más vendido</span><strong id="catalogo-producto-lider">—</strong><small id="catalogo-producto-cuota"></small></div>
+                    </div>
+                    <div class="catalogo-charts">
+                        <article class="table-data-card catalogo-chart"><h4>Ingresos por categoría</h4><p>Importe vendido y porcentaje de los ingresos.</p><ol id="catalogo-categorias" class="catalogo-bars"></ol></article>
+                        <article class="table-data-card catalogo-chart"><h4>Los 10 productos más vendidos</h4><p>Ranking por unidades. El porcentaje se calcula sobre todas las unidades vendidas.</p><ol id="catalogo-productos" class="catalogo-bars"></ol></article>
+                    </div>
+                    <p class="catalogo-aclaracion">Solo ventas emitidas. Los importes incluyen toppings y se agrupan según la categoría actual del producto principal. Los aportes de caja no se consideran ventas.</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <dialog id="sale-detail-dialog" class="sale-detail-dialog" aria-labelledby="sale-detail-title">
+        <div class="modal-content-card sale-detail-panel">
+            <div class="modal-header">
+                <div class="modal-header-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></div>
+                <h3 id="sale-detail-title" tabindex="-1">DETALLE DE BOLETA</h3>
+                <button type="button" class="btn-close-modal" aria-label="Cerrar detalle de venta" onclick="cerrarDetalleBoleta()">&times;</button>
+            </div>
+            <div id="sale-detail-content" class="sale-detail-content" aria-live="polite" aria-busy="false"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="cerrarDetalleBoleta()">Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Heladería & Waffles Artesanales</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

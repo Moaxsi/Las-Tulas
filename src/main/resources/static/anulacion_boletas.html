@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Anulación o Modificación de Boletas - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT DEL PANEL ADMINISTRADOR -->
+    <div class="layout-wrapper">
+        <!-- SIDEBAR DE NAVEGACIÓN -->
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4>ADMINISTRADOR</h4>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item active"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoria</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- CABECERA -->
+            <div class="view-header">
+                <div class="view-header-title">
+                    <div>
+                        <h2>ANULACIÓN O MODIFICACIÓN DE BOLETAS</h2>
+                        <p>Administra, anula o modifica las boletas emitidas en el sistema.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filter-card-bar">
+                <div class="filter-group">
+                    <label>Buscar boleta</label>
+                    <input type="text" id="filtro-anulacion-buscar" class="filter-input" placeholder="Buscar por Nº de boleta..." oninput="filtrarAnulacionBoletas()">
+                </div>
+
+                <div class="filter-group">
+                    <label for="filtro-anulacion-caja">Caja</label>
+                    <select id="filtro-anulacion-caja" class="filter-select" onchange="filtrarAnulacionBoletas('caja')">
+                        <option value="TODAS">Todas las cajas</option>
+                        <!-- Opciones generadas dinámicamente en script.js -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filtro-anulacion-cajero">Cajero</label>
+                    <select id="filtro-anulacion-cajero" class="filter-select" onchange="filtrarAnulacionBoletas('cajero')">
+                        <option value="TODOS">Todos los cajeros</option>
+                        <!-- Opciones generadas dinámicamente en script.js -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-group-label">Rango de fechas</span>
+                    <div class="filter-date-range">
+                        <label>Desde<input type="date" id="filtro-anulacion-f-inicio" class="filter-input" onchange="filtrarAnulacionBoletas()"></label>
+                        <label>Hasta<input type="date" id="filtro-anulacion-f-fin" class="filter-input" onchange="filtrarAnulacionBoletas()"></label>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TABLA: LISTA DE BOLETAS -->
+            <div class="table-data-card">
+                <div class="detalle-boletas-header">
+                    <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800;">LISTA DE BOLETAS</h4>
+                </div>
+
+                <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                    <table class="custom-table table-with-actions sales-summary-table">
+                        <thead>
+                            <tr>
+                                <th>Nº Boleta</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Caja</th>
+                                <th>Cajero</th>
+                                <th>Método de Pago</th>
+                                <th>Monto (S/)</th>
+                                <th>Estado</th>
+                                <th class="sale-detail-column">Detalles</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-anulacion-body">
+                            <!-- Llenado dinámicamente con script.js -->
+                        </tbody>
+    </table>
+                </div>
+
+                <div class="table-pagination-footer">
+                    <span id="label-paginacion-anulacion" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                        Mostrando 0 boletas
+                    </span>
+                    <div class="pagination-buttons">
+                        <span id="pagina-anulacion-actual" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;"></span>
+                        <button type="button" id="btn-pag-anulacion-anterior" class="btn-page">&laquo; Anterior</button>
+                        <button type="button" id="btn-pag-anulacion-siguiente" class="btn-page">Siguiente &raquo;</button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <dialog id="sale-detail-dialog" class="sale-detail-dialog" aria-labelledby="sale-detail-title">
+        <div class="modal-content-card sale-detail-panel">
+            <div class="modal-header">
+                <div class="modal-header-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></div>
+                <h3 id="sale-detail-title" tabindex="-1">DETALLE DE BOLETA</h3>
+                <button type="button" class="btn-close-modal" aria-label="Cerrar detalle de venta" onclick="cerrarDetalleBoleta()">&times;</button>
+            </div>
+            <div class="sale-management-scroll">
+                <div id="sale-detail-content" class="sale-detail-content" aria-live="polite" aria-busy="false"></div>
+                <div id="sale-detail-management" class="boleta-actions-panel" hidden>
+
+                    <p id="anular-ya-anulada-aviso" style="display: none; margin-top: 12px; font-size: 0.8rem; color: var(--status-red); font-weight: 700; text-align: center;">
+                        Esta boleta ya está anulada.
+                    </p>
+                    <div class="actions-tabs-header">
+                        <button class="action-tab-btn active" id="tab-btn-modificar" onclick="cambiarTabAccion('modificar')">
+                            Modificar boleta
+                        </button>
+                        <button class="action-tab-btn" id="tab-btn-eliminar" onclick="cambiarTabAccion('eliminar')">
+                            Eliminar boleta
+                        </button>
+                    </div>
+
+                    <!-- CONTENIDO TAB 1: MODIFICAR MÉTODO DE PAGO -->
+                    <div id="tab-content-modificar" class="tab-content-body active">
+                        <div class="info-alert-box">
+                            <i class="fa-solid fa-circle-info"></i>
+                            <span>Modifica los datos de la boleta seleccionada. Solo puedes cambiar el método de pago.</span>
+                        </div>
+
+                        <div style="margin-bottom: 18px;">
+                            <label style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 6px;">
+                                Método de pago actual
+                            </label>
+                            <span class="badge-metodo-pago" id="mod-metodo-actual-badge">—</span>
+                        </div>
+
+                        <div style="margin-bottom: 25px;">
+                            <label for="mod-nuevo-metodo-select" style="font-size: 0.8rem; font-weight: 700; color: var(--text-dark); display: block; margin-bottom: 6px;">
+                                Nuevo método de pago
+                            </label>
+                            <select id="mod-nuevo-metodo-select" aria-label="Nuevo método de pago" class="form-input">
+                                <option value="EFECTIVO">Efectivo</option>
+                                <option value="POS">POS</option>
+                                <option value="YAPE">Yape</option>
+                                <option value="EFECTIVO_POS">Efectivo + POS</option>
+                                <option value="EFECTIVO_YAPE">Efectivo + Yape</option>
+                                <option value="EFECTIVO_COMBINADO">Efectivo combinado</option>
+                            </select>
+                        </div>
+
+                        <button class="btn-primary-action" style="width: 100%; justify-content: center;" onclick="guardarModificacionMetodoPago()">
+                            <i class="fa-solid fa-floppy-disk"></i> Guardar cambios
+                        </button>
+                    </div>
+
+                    <!-- CONTENIDO TAB 2: ANULAR (nunca eliminar) -->
+                    <div id="tab-content-eliminar" class="tab-content-body">
+                        <div class="danger-alert-box">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                            <span>Atención: La boleta no se borra. Se marca como ANULADA, se emite la nota de crédito y el stock vuelve al inventario.</span>
+                        </div>
+
+                        <label for="input-motivo-anulacion" style="display: block; font-size: 0.78rem; font-weight: 700; margin-bottom: 6px; color: var(--text-muted);">
+                            MOTIVO DE LA ANULACIÓN
+                        </label>
+                        <textarea id="input-motivo-anulacion" class="form-input" rows="3"
+                                  placeholder="Ej. Cliente devolvió el pedido / error de cobro" disabled
+                                  style="width: 100%; resize: vertical; margin-bottom: 16px;"></textarea>
+
+                        <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                            La boleta <strong id="anular-nro-boleta-label">—</strong> quedará registrada
+                            como <strong>ANULADA</strong> junto a su nota de crédito.
+                        </p>
+
+                        <button id="btn-confirmar-anulacion" class="btn-danger-confirm" style="width: 100%; justify-content: center; padding: 14px;" onclick="ejecutarAnulacionBoleta()" disabled>
+                            <i class="fa-solid fa-file-circle-xmark"></i> Confirmar anulación de boleta
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="cerrarDetalleBoleta()">Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Heladería & Waffles Artesanales</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

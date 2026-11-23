@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Inventario - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- CONTENEDOR PRINCIPAL: SIDEBAR + VISTA -->
+    <div class="layout-wrapper">
+        <!-- SIDEBAR DE NAVEGACIÓN -->
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4>ADMINISTRADOR</h4>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item active"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoria</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO DEL INVENTARIO -->
+        <main class="main-content">
+            <div class="view-header inventory-view-header">
+                <div class="view-header-title">
+                    <div>
+                        <h2>INVENTARIO</h2>
+                        <p>Gestiona y controla todos los productos disponibles en tu negocio.</p>
+                    </div>
+                </div>
+                <div class="inventory-header-actions">
+                <button type="button" class="btn-primary-action" onclick="abrirConfiguracionIncluidos()"><i class="fa-solid fa-sliders" aria-hidden="true"></i> Configuración</button>
+                <button type="button" id="btn-agregar-categoria" class="btn-primary-action" onclick="abrirModalCategoria()">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar categoría
+                </button>
+                </div>
+            </div>
+            <p id="categoria-estado" class="inventory-category-status" role="status" aria-atomic="true" hidden></p>
+
+            <!-- FILTROS -->
+            <div class="filter-card-bar">
+                <div class="filter-group">
+                    <label for="filtro-buscar">Buscar producto</label>
+                    <input type="text" id="filtro-buscar" class="filter-input" placeholder="Buscar por nombre o referencia..." oninput="filtrarProductos()">
+                </div>
+                <div class="filter-group">
+                    <label for="filtro-categoria">Categoría</label>
+                    <select id="filtro-categoria" class="filter-select" onchange="filtrarProductos()">
+                        <option value="">Todas las categorías</option>
+                        <option value="1">TULAS</option>
+                        <option value="2">DULCHITAS</option>
+                        <option value="3">WAFLES</option>
+                        <option value="4">BEBIDAS</option>
+                        <option value="5">TOPPING</option>
+                        <option value="6">RAMEN</option>
+                        <option value="8">CREPES</option>
+                        <option value="9">BANDERILLAS</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="filtro-estado">Estado</label>
+                    <select id="filtro-estado" class="filter-select" onchange="filtrarProductos()">
+                        <option value="">Todos</option>
+                        <option value="Disponible">Disponible</option>
+                        <option value="Stock bajo">Stock bajo</option>
+                        <option value="Agotado">Agotado</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TABLA -->
+            <div class="table-data-card">
+                <div class="table-action-header inventory-table-toolbar">
+                <div class="inventory-create-actions">
+                <button type="button" class="btn-table-action inventory-create-button" onclick="abrirModalCrearAdicional()">
+                    <i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar toppings
+                </button>
+                <button type="button" class="btn-table-action inventory-create-button" onclick="abrirModalCrear()">
+                    <i class="fa-solid fa-plus"></i> Agregar producto
+                </button>
+                </div>
+                </div>
+
+                <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                    <table class="custom-table table-with-actions inventory-table">
+                        <thead>
+                            <tr>
+                                <th>Imagen</th>
+                                <th>Nombre del Producto</th>
+                                <th>Categoría</th>
+                                <th>Referencia</th>
+                                <th>Precio</th>
+                                <th>Cantidad</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-productos-body">
+                            <!-- Renderizado desde script.js -->
+                        </tbody>
+    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FOOTER INFERIOR -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Heladería & Waffles Artesanales</p>
+    </footer>
+
+    <!-- MODAL AGREGAR / EDITAR PRODUCTO -->
+    <div id="modal-producto" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-prod-titulo">
+        <div class="modal-content-card">
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="fa-solid fa-box-open"></i>
+                </div>
+                <h3 id="modal-prod-titulo">AGREGAR PRODUCTO</h3>
+                <button type="button" class="btn-close-modal" aria-label="Cerrar producto" onclick="cerrarModalProducto()">&times;</button>
+            </div>
+
+            <form id="form-producto" onsubmit="guardarProducto(event)">
+                <div class="modal-form-fields">
+                <input type="hidden" id="prod-id">
+
+                <div class="form-group" id="prod-tipo-group" hidden>
+                    <label for="prod-tipo">Tipo de adicional</label>
+                    <select id="prod-tipo" class="form-input" onchange="configurarTipoAdicionalInventario()">
+                        <option value="toppings">TOPPING</option>
+                        <option value="sabores">SABORES</option>
+                        <option value="frutas">FRUTAS</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="prod-nombre">Nombre del producto</label>
+                    <input type="text" id="prod-nombre" class="form-input" placeholder="Ej. El sugar daddy" maxlength="150" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="prod-ref">Referencia</label>
+                    <input type="text" id="prod-ref" class="form-input" placeholder="Ej. TULA02" maxlength="30" required>
+                </div>
+
+                <div class="form-group-grid">
+                    <div class="form-group">
+                        <label for="prod-precio">Precio (S/)</label>
+                        <input type="number" min="0" step="0.01" id="prod-precio" class="form-input" placeholder="Ej. 20.00" required>
+                        <label class="inventory-free-option" id="prod-gratis-group" hidden><input type="checkbox" id="prod-gratis" onchange="actualizarPrecioAdicionalInventario()"> Sin costo</label>
+                        <small id="prod-sabor-help" hidden>Los sabores son gratuitos.</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="prod-stock">Cantidad en stock</label>
+                        <input type="number" min="0" step="1" id="prod-stock" class="form-input" placeholder="Ej. 30" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="prod-cat" id="prod-cat-label">Categoría</label>
+                    <select id="prod-cat" class="form-input" required>
+                        <option value="1">TULAS</option>
+                        <option value="2">DULCHITAS</option>
+                        <option value="3">WAFLES</option>
+                        <option value="4">BEBIDAS</option>
+                        <option value="5">TOPPING</option>
+                        <option value="6">RAMEN</option>
+                        <option value="8">CREPES</option>
+                        <option value="9">BANDERILLAS</option>
+                    </select>
+                    <p id="prod-catalogo-estado" class="inline-form-error" role="status" hidden></p>
+                </div>
+
+                <fieldset id="prod-destinos-group" class="inventory-destinations" hidden>
+                    <legend>Disponible en estas categorías</legend>
+                    <p>Selecciona una o varias categorías de productos que puedan llevarlo.</p>
+                    <div id="prod-destinos" class="inventory-category-options"></div>
+                </fieldset>
+                <p id="prod-error" class="inline-form-error" role="alert" hidden></p>
+
+                <!-- CARGA DE IMAGEN -->
+                <div class="form-group">
+                    <label>Imagen del producto</label>
+                    <div class="image-upload-wrapper">
+                        <div class="image-drop-area" id="drop-zone" onclick="document.getElementById('file-input').click()">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                            <p>Arrastra tu imagen aquí o haz clic</p>
+                            <small>Soporta JPG, PNG o usa enlace URL</small>
+                            <input type="file" id="file-input" accept="image/*" style="display: none;" onchange="cargarImagenArchivo(this.files[0])">
+                        </div>
+
+                        <input type="url" id="prod-url-input" class="form-input" placeholder="O pega el enlace URL de la imagen aquí..." oninput="cargarImagenUrl(this.value)">
+
+                        <div id="preview-container" class="preview-box">
+                            <img id="img-preview" src="lastulas.jpg" alt="Preview">
+                            <div class="preview-info">
+                                <span id="preview-text">Imagen cargada</span>
+                                <button type="button" class="btn-remove-photo" onclick="quitarFoto()">
+                                    <i class="fa-solid fa-trash-can"></i> Quitar foto
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="cerrarModalProducto()">Cancelar</button>
+                    <button type="submit" class="btn-primary-action"><i class="fa-solid fa-floppy-disk"></i> Guardar producto</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <dialog id="modal-categoria" class="inventory-category-dialog" aria-labelledby="categoria-titulo" aria-describedby="categoria-ayuda">
+        <div class="modal-content-card">
+            <div class="modal-header">
+                <div class="modal-header-icon"><i class="fa-solid fa-layer-group" aria-hidden="true"></i></div>
+                <h3 id="categoria-titulo">AGREGAR CATEGORÍA</h3>
+                <button type="button" class="btn-close-modal" aria-label="Cerrar categoría" onclick="cerrarModalCategoria()">&times;</button>
+            </div>
+            <form id="form-categoria" onsubmit="guardarCategoria(event)">
+                <div class="modal-form-fields">
+                    <p id="categoria-ayuda" class="inventory-category-help">Crea una categoría para organizar tus productos. También podrás asignarle toppings y sabores.</p>
+                    <div class="form-group">
+                        <label for="categoria-nombre">Nombre de la categoría</label>
+                        <input id="categoria-nombre" class="form-input" type="text" maxlength="50" placeholder="Ej. Postres" required autocomplete="off" autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="categoria-descripcion">Descripción (opcional)</label>
+                        <textarea id="categoria-descripcion" class="form-input" rows="3" maxlength="500" placeholder="Describe qué productos incluirá esta categoría"></textarea>
+                    </div>
+                    <p id="categoria-error" class="inline-form-error" role="alert" hidden></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-cancel" onclick="cerrarModalCategoria()">Cancelar</button>
+                    <button type="submit" class="btn-primary-action"><i class="fa-solid fa-floppy-disk" aria-hidden="true"></i> <span>Guardar categoría</span></button>
+                </div>
+            </form>
+        </div>
+    </dialog>
+
+    <!-- MODAL ELIMINAR -->
+    <div id="modal-eliminar" class="modal-overlay">
+        <div class="delete-modal-card">
+            <div class="delete-modal-icon">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 style="font-size: 1.3rem; margin-bottom: 10px;">¿Eliminar producto?</h3>
+            <p id="delete-modal-msg" style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 22px;">
+                Estás a punto de eliminar este producto.
+            </p>
+            <div style="display: flex; justify-content: center; gap: 14px;">
+                <button class="btn-cancel" onclick="cerrarModalEliminar()">Cancelar</button>
+                <button class="btn-danger-confirm" id="btn-confirmar-delete">Sí, eliminar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <dialog id="config-incluidos" class="config-incluidos-dialog" aria-labelledby="config-incluidos-title" aria-describedby="config-incluidos-description">
+      <form id="form-incluidos" onsubmit="guardarConfiguracionIncluidos(event)">
+        <header class="config-incluidos-header">
+          <h2 id="config-incluidos-title">Configuración de incluidos</h2>
+          <button type="button" class="config-incluidos-close" aria-label="Cerrar configuración" onclick="cerrarConfiguracionIncluidos()">&times;</button>
+        </header>
+        <div class="config-incluidos-body">
+          <p id="config-incluidos-description">Elige un producto y define sus complementos incluidos por unidad.</p>
+          <div class="config-picker" data-picker="incluidos-categoria">
+            <label id="incluidos-categoria-label" for="incluidos-categoria-trigger">Categoría</label>
+            <button id="incluidos-categoria-trigger" type="button" class="config-picker-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="incluidos-categoria-list" aria-labelledby="incluidos-categoria-label incluidos-categoria-value" aria-required="true">
+              <span id="incluidos-categoria-value"></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="config-picker-panel" hidden>
+              <input type="search" class="config-picker-search" placeholder="Buscar categoría…" aria-label="Buscar categoría" autocomplete="off">
+              <div id="incluidos-categoria-list" class="config-picker-list" role="listbox" aria-labelledby="incluidos-categoria-label"></div>
+            </div>
+            <select id="incluidos-categoria" hidden onchange="cargarProductosIncluidos()"></select>
+          </div>
+          <div class="config-picker" data-picker="incluidos-producto">
+            <label id="incluidos-producto-label" for="incluidos-producto-trigger">Producto</label>
+            <button id="incluidos-producto-trigger" type="button" class="config-picker-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="incluidos-producto-list" aria-labelledby="incluidos-producto-label incluidos-producto-value" aria-required="true">
+              <span id="incluidos-producto-value"></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+            </button>
+            <div class="config-picker-panel" hidden>
+              <input type="search" class="config-picker-search" placeholder="Buscar producto…" aria-label="Buscar producto" autocomplete="off">
+              <div id="incluidos-producto-list" class="config-picker-list" role="listbox" aria-labelledby="incluidos-producto-label"></div>
+            </div>
+            <select id="incluidos-producto" hidden onchange="mostrarCuposIncluidos()"></select>
+          </div>
+          <div class="config-cupos-grid">
+            <div class="config-cupo">
+              <label for="incluidos-toppings">Toppings incluidos</label>
+              <div class="config-stepper">
+                <button type="button" data-step="-1" data-input="incluidos-toppings" aria-label="Reducir toppings incluidos">&minus;</button>
+                <input id="incluidos-toppings" type="number" inputmode="numeric" min="0" max="25" step="1" value="0" required>
+                <button type="button" data-step="1" data-input="incluidos-toppings" aria-label="Aumentar toppings incluidos">+</button>
+              </div>
+            </div>
+            <div class="config-cupo">
+              <label for="incluidos-frutas">Frutas incluidas</label>
+              <div class="config-stepper">
+                <button type="button" data-step="-1" data-input="incluidos-frutas" aria-label="Reducir frutas incluidas">&minus;</button>
+                <input id="incluidos-frutas" type="number" inputmode="numeric" min="0" max="25" step="1" value="0" required>
+                <button type="button" data-step="1" data-input="incluidos-frutas" aria-label="Aumentar frutas incluidas">+</button>
+              </div>
+            </div>
+          </div>
+          <p class="config-incluidos-help">Con 0 se cobra desde la primera selección. Al superar cada cupo, se cobra el precio normal.</p>
+          <p id="incluidos-estado" class="config-incluidos-status" role="status" aria-live="polite" aria-atomic="true" data-kind="info">Selecciona una categoría para empezar.</p>
+        </div>
+        <footer class="config-incluidos-actions">
+          <button type="button" class="btn-cancel" onclick="cerrarConfiguracionIncluidos()">Cerrar</button>
+          <button type="submit" class="btn-primary-action">Guardar configuración</button>
+        </footer>
+      </form>
+    </dialog>
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="config-incluidos-ui.js?v=a6625dcebfb2"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

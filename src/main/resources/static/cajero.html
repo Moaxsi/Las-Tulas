@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Caja / Punto de Venta - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="page-pos">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="cajero-header">
+        <div class="cajero-header-container">
+            <a href="cajero.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="cajero-user-info">
+                <div class="user-tag"><i class="fa-solid fa-cash-register"></i> <span id="nombre-cajero">Cajero 01</span></div>
+                <a href="cierre_caja.html" class="btn-cajero-logout" aria-label="Abrir mi caja"><i class="fa-solid fa-vault" aria-hidden="true"></i><span>Mi caja</span></a>
+                <a href="index.html" class="btn-cajero-logout" aria-label="Salir" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Salir</span></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT PRINCIPAL DEL POS -->
+    <main class="pos-container-layout" id="contenido-principal">
+        
+        <!-- PANEL 1: CATEGORÍAS (se arman desde /api/categorias) -->
+        <!-- Los botones estaban escritos a mano con ids fijos: si el admin
+             creaba una categoria nueva no aparecia, y si borraba una, el boton
+             seguia ahi filtrando por un id que ya no existe. -->
+        <aside class="pos-categories-panel">
+            <div class="pos-panel-title">Categorías</div>
+            <div id="pos-categorias">
+                <button class="btn-cat-item active" onclick="filtrarPOS(0, this)">TODAS</button>
+            </div>
+            <div id="pos-caja-actual" style="margin-top:14px; font-size:0.7rem; color:var(--text-muted); line-height:1.5;"></div>
+        </aside>
+
+        <!-- PANEL 2: CARTA COMPLETA Y BÚSQUEDA -->
+        <section class="pos-center-panel">
+            <div class="section-header-flex">
+                <div class="section-subtitle-group">
+                    <h1 id="titulo-seccion-pos" tabindex="-1">Carta Las Tulas</h1>
+                    <p id="pos-results-summary" aria-live="polite">Productos disponibles</p>
+                </div>
+                <div class="pos-catalog-controls">
+                    <label class="pos-search-box" for="input-buscar-pos">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input id="input-buscar-pos" aria-label="Buscar producto por nombre o referencia" type="search" placeholder="Buscar producto" autocomplete="off">
+                    </label>
+                </div>
+            </div>
+
+            <!-- Carta completa: búsqueda y categorías mantienen la lista manejable en móvil -->
+            <div id="pos-grid-productos" class="pos-products-grid">
+                <!-- Inyectado por script.js -->
+            </div>
+
+            <div class="selection-info-toast" id="toast-seleccion-info">
+                <i class="fa-solid fa-circle-info"></i>
+                <span id="texto-seleccion-info">Selecciona un producto y toppings si el cliente lo desea.</span>
+            </div>
+        </section>
+
+        <!-- PANEL 3: TU PEDIDO ACTUAL -->
+        <aside class="pos-order-panel" aria-label="Pedido actual">
+            <button type="button" class="pos-mobile-cart-trigger" id="pos-mobile-cart-trigger"
+                    aria-expanded="false" aria-controls="pos-mobile-cart-content" onclick="alternarCarritoMovil()">
+                <span class="pos-mobile-cart-icon"><i class="fa-solid fa-bag-shopping" aria-hidden="true"></i><span id="pos-mobile-cart-count">0</span></span>
+                <span class="pos-mobile-cart-copy"><strong>Tu pedido</strong><small id="pos-mobile-cart-label">0 productos</small></span>
+                <strong class="pos-mobile-cart-total" id="pos-mobile-cart-total">S/ 0.00</strong>
+                <i class="fa-solid fa-chevron-up pos-mobile-cart-chevron" aria-hidden="true"></i>
+            </button>
+            <div class="pos-order-content" id="pos-mobile-cart-content">
+                <div class="order-header">
+                    <h3 id="contador-items-header">Tu Pedido (0)</h3>
+                    <div class="pos-order-actions">
+                    <button type="button" id="pos-btn-nota" class="btn-cart-note" onclick="abrirNotasPOS()" disabled><i class="fa-regular fa-note-sticky" aria-hidden="true"></i> Nota<span id="pos-nota-count" hidden></span></button>
+                    <button type="button" class="btn-vaciar-cart" onclick="abrirModalVaciar()"><i class="fa-solid fa-trash-can" aria-hidden="true"></i> Vaciar</button>
+                    </div>
+                </div>
+
+                <div class="order-items-list" id="pos-order-items">
+                    <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-top: 50px;">
+                        No hay productos en el pedido.
+                    </p>
+                </div>
+                <div class="order-summary-box">
+                    <div class="summary-row">
+                        <span>OP. GRAVABLE</span>
+                        <span id="pos-subtotal">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span id="pos-igv-pct">IGV 18%</span>
+                        <span id="pos-igv">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row total-row">
+                        <span>Total a pagar</span>
+                        <span id="pos-total">S/ 0.00</span>
+                    </div>
+                    <button type="button" class="btn-submit-order" onclick="irACobrarPOS()">
+                        <span>Ir a pagar</span>
+                        <span id="pos-btn-total">S/ 0.00 <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+    </main>
+    <div id="pos-live-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <button type="button" id="pos-back-to-top" class="pos-back-to-top" onclick="volverArribaPOS()" hidden>
+        <i class="fa-solid fa-arrow-up" aria-hidden="true"></i> Volver arriba
+    </button>
+
+    <button type="button" class="pos-cart-backdrop" id="pos-cart-backdrop" aria-label="Cerrar pedido" onclick="alternarCarritoMovil(false)" hidden></button>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Terminal de Ventas y Caja</p>
+    </footer>
+
+    <!-- =====================================================
+         MODALES PERSONALIZADOS (SIN CONSOLAS NI ALERTS)
+         ===================================================== -->
+
+    <!-- MODAL: LISTA COMPLETA DE TOPPINGS -->
+    <div id="modal-toppings-completo" class="pos-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pos-topping-title" aria-describedby="pos-topping-product" tabindex="-1">
+        <div class="pos-modal-card medium">
+            <div class="pos-modal-header">
+                <div>
+                    <h3 id="pos-topping-title">Elige los toppings</h3>
+                    <p id="pos-topping-product"></p>
+                </div>
+                <button class="btn-close-pos-modal" aria-label="Cerrar toppings" onclick="cerrarModalToppings()">&times;</button>
+            </div>
+            <div class="pos-adicional-tabs" role="group" aria-label="Tipo de adicional">
+                <button type="button" id="pos-tab-toppings" onclick="cambiarTipoAdicionalPOS('toppings')" aria-pressed="true">Toppings</button>
+                <button type="button" id="pos-tab-frutas" onclick="cambiarTipoAdicionalPOS('frutas')" aria-pressed="false">Frutas</button>
+                <button type="button" id="pos-tab-sabores" onclick="cambiarTipoAdicionalPOS('sabores')" aria-pressed="false">Sabores</button>
+            </div>
+            <div class="modal-search-box">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                <input type="search" id="input-buscar-modal-top" aria-label="Buscar topping" placeholder="Buscar topping o salsa…" oninput="filtrarModalToppings()" autocomplete="off">
+            </div>
+            <div id="grid-modal-todos-toppings" class="toppings-grid modal-grid-scroll">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="pos-topping-footer">
+                <div class="pos-topping-summary" role="status" aria-live="polite" aria-atomic="true">
+                    <span id="pos-topping-count">Sin toppings</span>
+                    <strong id="pos-topping-total"></strong>
+                </div>
+                <button type="button" class="btn-submit-order" onclick="cerrarModalToppings()"><span>Listo, continuar</span><i class="fa-solid fa-check" aria-hidden="true"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <dialog id="pos-notas-modal" class="pos-notes-dialog" aria-labelledby="pos-notas-title">
+        <form class="pos-note-panel" onsubmit="guardarNotasPOS(event)">
+            <div class="pos-modal-header">
+                <div>
+                    <h3 id="pos-notas-title" tabindex="-1">Nota del producto</h3>
+                    <p id="pos-notas-help">Se guardará con la venta y se imprimirá debajo del producto en la copia para cocina.</p>
+                </div>
+                <button type="button" class="btn-close-pos-modal" aria-label="Cerrar notas sin guardar" onclick="cerrarNotasPOS()">&times;</button>
+            </div>
+            <div class="pos-note-fields">
+                <div id="pos-notas-selector" class="config-picker">
+                    <label id="pos-notas-producto-label" for="pos-notas-producto-trigger">Producto del pedido</label>
+                    <button id="pos-notas-producto-trigger" type="button" class="config-picker-trigger" role="combobox" aria-haspopup="listbox" aria-expanded="false" aria-controls="pos-notas-producto-list" aria-labelledby="pos-notas-producto-label pos-notas-producto-value" onclick="alternarSelectorNotaPOS()">
+                        <span id="pos-notas-producto-value"></span><i class="fa-solid fa-chevron-down" aria-hidden="true"></i>
+                    </button>
+                    <div id="pos-notas-producto-panel" class="config-picker-panel" hidden>
+                        <div id="pos-notas-producto-list" class="config-picker-list" role="listbox" aria-labelledby="pos-notas-producto-label"></div>
+                    </div>
+                    <select id="pos-notas-producto" hidden onchange="cambiarProductoNotaPOS()"></select>
+                </div>
+                <label for="pos-notas-texto">Indicaciones</label>
+                <textarea id="pos-notas-texto" class="form-input" rows="4" maxlength="300" placeholder="Por ejemplo: sin azúcar, servir por separado…" aria-describedby="pos-notas-help pos-notas-limit" oninput="actualizarBorradorNotaPOS()"></textarea>
+                <div class="pos-note-helper"><small>Déjala vacía para quitar la nota.</small><small id="pos-notas-limit">0/300</small></div>
+            </div>
+            <div class="pos-note-actions">
+                <button type="button" class="btn-modal-cancel" onclick="cerrarNotasPOS()">Cancelar</button>
+                <button type="submit" class="btn-submit-order"><i class="fa-solid fa-check" aria-hidden="true"></i> Guardar notas</button>
+            </div>
+        </form>
+    </dialog>
+
+    <!-- MODAL 2: CONFIRMACIÓN PERSONALIZADA PARA VACIAR CARRITO -->
+    <div id="modal-confirmar-vaciar" class="pos-modal-overlay">
+        <div class="pos-modal-card small text-center">
+            <div class="icon-warning-bubble">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; margin-bottom: 8px; color: var(--text-dark);">¿Vaciar todo el pedido?</h3>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+                Se quitarán todos los productos y toppings de la comanda actual.
+            </p>
+            <div class="modal-actions-row">
+                <button class="btn-modal-cancel" onclick="cerrarModalVaciar()">Cancelar</button>
+                <button class="btn-modal-confirm-delete" onclick="ejecutarVaciarCarrito()">Sí, vaciar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

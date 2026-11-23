@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Auditoria - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user-gear"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-wrapper">
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4 class="sidebar-role-title">ADMINISTRADOR</h4>
+            </div>
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item active"><i class="fa-solid fa-clipboard-list"></i> Auditoría</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+    <div class="pagina-simple">
+
+        <!-- FILTROS -->
+        <div class="view-header">
+            <div class="view-header-title">
+                <div>
+                    <h2>AUDITORIA DEL SISTEMA</h2>
+                    <p>Quién hizo qué y cuándo. Solo lectura: los registros no se editan.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="filter-card-bar">
+            <div class="filter-group">
+                <label for="filtro-auditoria-tabla">Tabla</label>
+                <select id="filtro-auditoria-tabla" class="filter-select" onchange="filtrarAuditoria()">
+                    <option value="">Todas las tablas</option>
+                    <option value="PRODUCTOS">Productos</option>
+                    <option value="VENTAS">Ventas</option>
+                    <option value="CAJAS">Cajas</option>
+                    <option value="TOPPINGS">Toppings</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="filtro-auditoria-accion">Accion</label>
+                <select id="filtro-auditoria-accion" class="filter-select" onchange="filtrarAuditoria()">
+                    <option value="">Todas las acciones</option>
+                    <option value="CREAR">Crear</option>
+                    <option value="MODIFICAR">Modificar</option>
+                    <option value="DAR_DE_BAJA">Dar de baja</option>
+                    <option value="REACTIVAR">Reactivar</option>
+                    <option value="ANULAR">Anular</option>
+                    <option value="CAMBIAR_METODO_PAGO">Cambio de metodo de pago</option>
+                    <option value="ABRIR_CAJA">Abrir caja</option>
+                    <option value="CERRAR_CAJA">Cerrar caja</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-group-label">Rango de fechas</span>
+                    <div class="filter-date-range">
+                        <label>Desde<input type="date" id="filtro-auditoria-f-inicio" class="filter-input" onchange="filtrarAuditoria()"></label>
+                        <label>Hasta<input type="date" id="filtro-auditoria-f-fin" class="filter-input" onchange="filtrarAuditoria()"></label>
+                    </div>
+            </div>
+
+            <div>
+                <button class="btn-table-action" onclick="filtrarAuditoria()">
+                    <i class="fa-solid fa-sliders"></i> Filtrar
+                </button>
+            </div>
+        </div>
+
+        <!-- REGISTROS -->
+        <div class="table-data-card" style="margin-top: 20px;">
+            <div class="detalle-boletas-header">
+                <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800;">REGISTROS</h4>
+                <button class="btn-table-action" onclick="cargarAuditoria()">
+                    <i class="fa-solid fa-rotate"></i> Actualizar
+                </button>
+            </div>
+
+            <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Fecha y hora</th>
+                            <th>Usuario</th>
+                            <th>Tabla</th>
+                            <th>Registro</th>
+                            <th>Accion</th>
+                            <th>Valor anterior</th>
+                            <th>Valor nuevo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-auditoria-body">
+                        <!-- Generado por script.js -->
+                    </tbody>
+    </table>
+            </div>
+
+            <div class="table-pagination-footer">
+                <span id="label-paginacion-auditoria" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                    Mostrando 0 registros
+                </span>
+                <div class="pagination-buttons">
+                    <span id="pagina-auditoria-actual" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;"></span>
+                    <button type="button" id="btn-pag-auditoria-anterior" class="btn-page">&laquo; Anterior</button>
+                    <button type="button" id="btn-pag-auditoria-siguiente" class="btn-page">Siguiente &raquo;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Auditoria</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

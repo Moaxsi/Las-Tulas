@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Mi caja - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="page-cierre">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="cajero.html" id="caja-inicio" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS | CAJA</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-vault"></i> <span id="caja-usuario">Mi caja</span></div>
+                <a href="cajero.html" id="caja-volver" class="btn-header-logout" aria-label="Volver al punto de venta"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i><span>Volver</span></a>
+                <a href="index.html" class="btn-header-logout" aria-label="Salir" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i><span>Salir</span></a>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-wrapper">
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4 class="sidebar-role-title">ADMINISTRADOR</h4>
+            </div>
+            <ul class="sidebar-menu">
+                <li data-roles="ADMIN"><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li data-roles="ADMIN"><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li data-roles="ADMIN"><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li data-roles="CAJERO"><a href="cajero.html" class="nav-link-item"><i class="fa-solid fa-cash-register"></i> Punto de Venta</a></li>
+                <li data-roles="CAJERO,ADMIN"><a href="cierre_caja.html" class="nav-link-item active"><i class="fa-solid fa-vault"></i> Mi caja</a></li>
+                <li data-roles="ADMIN"><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li data-roles="ADMIN"><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoría</a></li>
+                <li data-roles="ADMIN"><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+        <main class="main-content">
+    <div class="pagina-simple stack-gap-18">
+
+        <section id="caja-dashboard-dia" class="catalogo-dashboard" data-caja-admin hidden aria-labelledby="caja-dia-titulo">
+            <div class="detalle-boletas-header"><div><h3 id="caja-dia-titulo">VENTAS DEL DÍA</h3><p id="caja-dia-fecha">Todas las ventas de todos los cajeros.</p></div><button type="button" class="btn-table-action" onclick="cargarCierreCaja()"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar</button></div>
+            <p id="caja-dia-aviso" class="caja-ayuda" role="status"></p>
+            <div class="catalogo-kpis caja-dia-kpis">
+                <div class="table-data-card"><span>Total vendido hoy</span><strong id="caja-dia-total">S/ 0.00</strong></div>
+                <div class="table-data-card"><span>Boletas emitidas</span><strong id="caja-dia-boletas">0</strong></div>
+                <div class="table-data-card"><span>Ventas en efectivo</span><strong id="caja-dia-efectivo">S/ 0.00</strong></div>
+                <div class="table-data-card"><span>Ventas digitales</span><strong id="caja-dia-digital">S/ 0.00</strong></div>
+            </div>
+            <div class="catalogo-charts"><div class="table-data-card catalogo-chart"><h4>Ventas por categoría</h4><p>Participación en el importe vendido hoy.</p><ul id="caja-dia-categorias" class="catalogo-bars"></ul></div><div class="table-data-card catalogo-chart"><h4>Productos más vendidos</h4><p>Unidades y porcentaje de las unidades del día.</p><ul id="caja-dia-productos" class="catalogo-bars"></ul></div></div>
+        </section>
+        <section id="caja-turnos-anteriores" class="table-data-card caja-consulta-aviso" hidden data-caja-admin aria-labelledby="caja-anteriores-titulo"><h4 id="caja-anteriores-titulo" class="caja-section-title">TURNOS ANTERIORES PENDIENTES</h4><p>Hay varios turnos del sistema anterior abiertos. Ciérralos con su conteo y una nota antes de abrir la caja general. Las ventas y sus importes se conservan.</p><div id="caja-anteriores-lista"></div></section>
+        <p id="caja-mensaje" class="caja-mensaje" role="status" aria-live="polite"></p>
+        <div id="caja-sin-turno" class="table-data-card caja-consulta-aviso" hidden>La caja general está cerrada. El administrador se encarga de abrirla y cerrarla; puedes consultar tus ventas aquí.</div>
+        <!-- TURNO ACTUAL -->
+        <div class="table-data-card">
+            <div class="detalle-boletas-header">
+                <h4 id="caja-titulo-turno" style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800;">CAJA GENERAL</h4>
+                <span id="estado-turno-pill" class="estado-pill cerrada">SIN TURNO</span>
+            </div>
+
+            <!-- Sin turno abierto: solo aparece el formulario de apertura -->
+            <div id="panel-apertura" style="display: none; padding: 22px;">
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 16px;">
+                    Abre una sola caja para todos los cajeros con el efectivo inicial de la gaveta.
+                    Todas sus ventas quedarán incluidas en este cierre.
+                </p>
+                <div class="form-grid">
+                    <div class="form-field">
+                        <label for="input-monto-inicial">Monto inicial (S/)</label>
+                        <input type="number" id="input-monto-inicial" class="filter-input" min="0" step="0.01" value="0.00">
+                    </div>
+                    <div class="form-field" style="display: flex; align-items: flex-end;">
+                        <button class="btn-accion-pagina" onclick="abrirTurnoCaja()">
+                            <i class="fa-solid fa-lock-open"></i> Abrir turno
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Turno abierto: arqueo -->
+            <div id="panel-cierre" style="display: none; padding: 22px;">
+                <div id="arqueo-alerta" data-caja-admin class="arqueo-alerta pendiente">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                    <span id="arqueo-alerta-texto">Cuenta el efectivo de la gaveta e ingrésalo.</span>
+                </div>
+
+                <p class="caja-ayuda">Totales de este turno de caja, de todos los cajeros. El resumen del día aparece arriba.</p>
+                <div class="reporte-total-grid" style="margin-top: 18px;">
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge blue">
+                            <i class="fa-solid fa-coins"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Base inicial</span>
+                            <strong id="caja-base-inicial">S/ 0.00</strong>
+                        </div>
+                    </div>
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge pink">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Boletas</span>
+                            <strong id="caja-total-boletas">0</strong>
+                        </div>
+                    </div>
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge green">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Efectivo</span>
+                            <strong id="caja-total-efectivo">S/ 0.00</strong>
+                        </div>
+                    </div>
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge blue">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Digital</span>
+                            <strong id="caja-total-digital">S/ 0.00</strong>
+                        </div>
+                    </div>
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge pink">
+                            <span style="font-weight: 900; font-size: 1.1rem;">S/</span>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Total vendido</span>
+                            <strong id="caja-total-ventas">S/ 0.00</strong>
+                        </div>
+                    </div>
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge green">
+                            <i class="fa-solid fa-vault"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Debe haber en gaveta</span>
+                            <strong id="caja-efectivo-esperado">S/ 0.00</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-grid" data-caja-admin style="margin-top: 20px;">
+                    <div class="form-field">
+                        <label for="input-efectivo-contado">Efectivo contado (S/)</label>
+                        <input type="number" id="input-efectivo-contado" class="filter-input" min="0" step="0.01" placeholder="Ingresa el efectivo contado">
+                    </div>
+                    <div class="form-field">
+                        <label for="input-observaciones">Observaciones</label>
+                        <textarea id="input-observaciones" maxlength="300" placeholder="Opcional: explica cualquier diferencia o incidente."></textarea>
+                    </div>
+                </div>
+
+                <section class="caja-aporte" data-caja-admin aria-labelledby="caja-movimientos-titulo">
+                    <div class="caja-movimientos-header"><h4 id="caja-movimientos-titulo" class="caja-section-title">MOVIMIENTOS DE EFECTIVO</h4><div class="caja-acciones"><button type="button" class="btn-table-action" onclick="abrirMovimientoCaja('REPOSICION_CAJA')"><i class="fa-solid fa-plus" aria-hidden="true"></i> Agregar dinero</button><button type="button" class="btn-table-action" onclick="abrirMovimientoCaja('RETIRO_CAJA')"><i class="fa-solid fa-minus" aria-hidden="true"></i> Registrar retiro</button></div></div>
+                    <p class="caja-ayuda">Registra el monto y el motivo de cada entrada, reposición o retiro. Estos movimientos no son ventas.</p>
+                    <ul id="caja-movimientos-lista" class="caja-movimientos-lista"></ul>
+                </section>
+                <div data-caja-admin style="margin-top: 18px; display: flex; gap: 12px; align-items: center;">
+                    <button class="btn-accion-pagina no-danger" onclick="cerrarTurnoCaja()">
+                        <i class="fa-solid fa-lock"></i> Cerrar caja
+                    </button>
+                    <span id="cierre-aviso" style="font-size: 0.82rem; color: var(--text-muted);"></span>
+                </div>
+            </div>
+        </div>
+
+        <section class="table-data-card" aria-labelledby="caja-ventas-titulo">
+            <div class="detalle-boletas-header"><div><h4 id="caja-ventas-titulo" class="caja-section-title">MIS VENTAS</h4><small id="caja-ventas-ayuda">Tu historial de ventas y sus comprobantes.</small></div><button type="button" class="btn-table-action" onclick="cargarVentasMiCaja()"><i class="fa-solid fa-rotate" aria-hidden="true"></i> Actualizar</button></div>
+            <div class="table-scroll-region" role="region" aria-label="Historial de ventas del trabajador" tabindex="0"><table class="custom-table"><thead><tr><th>Comprobante</th><th>Fecha y hora</th><th>Cajero</th><th>Método de pago</th><th>Total</th><th>Estado</th></tr></thead><tbody id="caja-ventas-body"></tbody></table></div>
+            <div class="table-pagination-footer"><span id="label-paginacion-mi-caja-ventas"></span><div class="pagination-buttons"><span id="pagina-mi-caja-ventas-actual"></span><button type="button" id="btn-pag-mi-caja-ventas-anterior" class="btn-page">&laquo; Anterior</button><button type="button" id="btn-pag-mi-caja-ventas-siguiente" class="btn-page">Siguiente &raquo;</button></div></div>
+        </section>
+        <!-- HISTORIAL DE TURNOS -->
+        <div class="table-data-card" data-caja-admin>
+            <div class="detalle-boletas-header">
+                <div>
+                    <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800;">HISTORIAL DE ARQUEOS</h4>
+                    <small style="color: var(--text-muted); font-weight: 600;">
+                        Los totales de un turno cerrado quedan congelados: anular una venta vieja ya no cambia su arqueo.
+                    </small>
+                </div>
+                <button class="btn-table-action" onclick="cargarHistorialCajas()">
+                    <i class="fa-solid fa-rotate"></i> Actualizar
+                </button>
+            </div>
+
+            <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Apertura</th>
+                            <th>Cierre</th>
+                            <th>Responsable de apertura</th>
+                            <th>Boletas</th>
+                            <th>Ventas</th>
+                            <th>Efectivo esperado</th>
+                            <th>Contado</th>
+                            <th>Diferencia</th>
+                            <th>Estado</th><th>Notas y movimientos</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-historial-caja-body">
+                        <!-- Generado por script.js -->
+                    </tbody>
+    </table>
+            </div>
+
+            <div class="table-pagination-footer">
+                <span id="label-paginacion-caja" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                    Mostrando 0 turnos
+                </span>
+                <div class="pagination-buttons">
+                    <span id="pagina-caja-actual" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;"></span>
+                    <button type="button" id="btn-pag-caja-anterior" class="btn-page">&laquo; Anterior</button>
+                    <button type="button" id="btn-pag-caja-siguiente" class="btn-page">Siguiente &raquo;</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="table-data-card" style="padding: 25px;">
+            <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">
+                CAMBIAR MI PIN
+            </h4>
+            <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 18px;">
+                Cada trabajador debe usar su propia cuenta. Cambia el PIN inicial antes de operar con datos reales.
+            </p>
+            <form id="form-cambiar-mi-pin" onsubmit="cambiarMiPin(event)">
+                <div class="user-creation-grid">
+                    <div class="user-form-left-col">
+                        <div class="form-group">
+                            <label for="mi-pin-actual">PIN actual</label>
+                            <input type="password" id="mi-pin-actual" class="form-input"
+                                   inputmode="numeric" autocomplete="current-password"
+                                   maxlength="10" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="mi-pin-nuevo">PIN nuevo (4 a 10 dígitos)</label>
+                            <input type="password" id="mi-pin-nuevo" class="form-input"
+                                   inputmode="numeric" autocomplete="new-password"
+                                   minlength="4" maxlength="10" pattern="[0-9]{4,10}" required>
+                        </div>
+                    </div>
+                    <div class="user-form-right-col">
+                        <button type="submit" class="btn-primary-action"
+                                style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem;">
+                            <i class="fa-solid fa-key"></i> Actualizar mi PIN
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Caja y arqueo</p>
+    </footer>
+
+    <dialog id="modal-movimiento-caja" class="inventory-category-dialog" aria-labelledby="movimiento-caja-titulo">
+        <form id="form-movimiento-caja" class="modal-content-card" onsubmit="guardarMovimientoCaja(event)">
+            <div class="modal-header"><div class="modal-header-icon"><i class="fa-solid fa-vault" aria-hidden="true"></i></div><h3 id="movimiento-caja-titulo">AGREGAR DINERO</h3><button type="button" class="btn-close-modal" aria-label="Cerrar" onclick="document.getElementById('modal-movimiento-caja').close()"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+            <div class="form-field"><label for="movimiento-caja-tipo">Tipo de movimiento</label><select id="movimiento-caja-tipo" class="filter-select" onchange="describirMovimientoCaja()"><option value="REPOSICION_CAJA">Reposición de un faltante</option><option value="INGRESO_CAJA">Ingreso adicional a la caja</option><option value="RETIRO_CAJA">Retiro para un gasto</option></select></div>
+            <p id="movimiento-caja-ayuda" class="inventory-category-help"></p>
+            <div class="form-field"><label for="movimiento-caja-monto">Monto (S/)</label><input id="movimiento-caja-monto" class="filter-input" type="number" inputmode="decimal" min="0.01" max="99999999.99" step="0.01" required></div>
+            <div class="form-field"><label for="movimiento-caja-motivo">Motivo</label><textarea id="movimiento-caja-motivo" maxlength="300" required placeholder="Ej. Reposición por un pago a delivery sin registrar."></textarea></div>
+            <p id="movimiento-caja-error" class="inline-form-error" role="alert"></p>
+            <div class="modal-footer"><button type="button" class="btn-cancel" onclick="document.getElementById('modal-movimiento-caja').close()">Cancelar</button><button type="submit" id="movimiento-caja-guardar" class="btn-primary-action"><i class="fa-solid fa-check" aria-hidden="true"></i> Registrar movimiento</button></div>
+        </form>
+    </dialog>
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

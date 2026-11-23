@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Creación de Usuario para Cajero - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT DEL PANEL ADMINISTRADOR -->
+    <div class="layout-wrapper">
+        <!-- SIDEBAR DE NAVEGACIÓN -->
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4>ADMINISTRADOR</h4>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoria</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item active"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- CABECERA -->
+            <div class="view-header">
+                <div class="view-header-title">
+                    <div>
+                        <h2>CREACIÓN DE USUARIO PARA CAJERO</h2>
+                        <p>Administra los usuarios que podrán acceder al sistema como cajeros.</p>
+                    </div>
+                </div>
+                <button class="btn-primary-action" onclick="enfocarFormularioUsuario()">
+                    <i class="fa-solid fa-plus"></i> Agregar usuario
+                </button>
+            </div>
+
+            <!-- TABLA DE USUARIOS CAJEROS -->
+            <div class="table-data-card">
+                <div class="card-table-top-bar">
+                    <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800; text-transform: uppercase;">
+                        USUARIOS CAJEROS
+                    </h4>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div class="search-input-inline">
+                            <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
+                            <input type="text" id="filtro-buscar-usuario" placeholder="Buscar por nombre de usuario..." oninput="filtrarUsuariosCajeros()">
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <label for="filtro-estado-usuario" style="font-size: 0.8rem; font-weight: 700; color: var(--text-muted);">Estado</label>
+                            <select id="filtro-estado-usuario" class="select-clean" onchange="filtrarUsuariosCajeros()">
+                                <option value="TODOS">Todos</option>
+                                <option value="Activo">Activo</option>
+                                <option value="Inactivo">Inactivo</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                    <table class="custom-table table-with-actions">
+                        <thead>
+                            <tr>
+                                <th>Nº</th>
+                                <th>NOMBRE COMPLETO</th>
+                                <th>USUARIO</th>
+                                <th>ROL</th>
+                                <th>FECHA DE CREACIÓN</th>
+                                <th>ESTADO</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-usuarios-cajeros-body">
+                            <!-- Renderizado dinámicamente con script.js -->
+                        </tbody>
+    </table>
+                </div>
+
+                <div class="table-pagination-footer">
+                    <span id="label-paginacion-usuarios" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                        Mostrando 0 de 0 usuarios
+                    </span>
+                    <div class="pagination-buttons">
+                        <span id="pagina-usuarios-actual"></span>
+                        <button type="button" id="btn-pag-usuarios-anterior" class="btn-page">&laquo; Anterior</button>
+                        <button type="button" id="btn-pag-usuarios-siguiente" class="btn-page">Siguiente &raquo;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FORMULARIO INFERIOR: AGREGAR NUEVO USUARIO CAJERO -->
+            <div class="table-data-card" style="margin-top: 25px; padding: 25px;" id="card-form-usuario">
+                <h4 style="color: var(--primary-pink); font-size: 0.95rem; font-weight: 800; text-transform: uppercase; margin-bottom: 20px;">
+                    AGREGAR NUEVO USUARIO CAJERO
+                </h4>
+
+                <form id="form-crear-cajero" onsubmit="guardarNuevoCajero(event)">
+                    <div class="user-creation-grid">
+                        <!-- Lado Izquierdo: Campos del Formulario -->
+                        <div class="user-form-left-col">
+                            <div class="form-group">
+                                <label>Nombre completo</label>
+                                <input type="text" id="cajero-nombre-completo" class="form-input" placeholder="Ej: María López" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Nombre de usuario</label>
+                                <input type="text" id="cajero-usuario-login" class="form-input" placeholder="Ej: mlopez" required>
+                                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 2px;">
+                                    Este será el usuario con el que el cajero iniciará sesión.
+                                </small>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Contraseña / PIN de acceso</label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" id="cajero-password" class="form-input" placeholder="Ej: 0005" required maxlength="10">
+                                    <i class="fa-regular fa-eye toggle-pass-icon" onclick="togglePasswordVisibility('cajero-password', this)"></i>
+                                </div>
+                                <small style="color: var(--text-muted); font-size: 0.75rem; margin-top: 2px;">
+                                    El cajero usará esta contraseña o código PIN para ingresar al sistema.
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Lado Derecho: Tarjeta Informativa y Botón -->
+                        <div class="user-form-right-col">
+                            <div class="info-important-card">
+                                <div class="important-icon-circle">
+                                    <i class="fa-solid fa-info"></i>
+                                </div>
+                                <div>
+                                    <strong style="color: var(--primary-pink); font-size: 0.95rem; display: block; margin-bottom: 4px;">Importante</strong>
+                                    <p style="font-size: 0.8rem; color: var(--text-muted); line-height: 1.4;">
+                                        El usuario y la contraseña serán utilizados para que el cajero pueda acceder al sistema.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn-primary-action" style="width: 100%; justify-content: center; padding: 14px; font-size: 1rem;">
+                                <i class="fa-solid fa-floppy-disk"></i> Agregar usuario
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Heladería & Waffles Artesanales</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Pasarela de Pago - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="page-checkout">
+
+    <!-- HEADER SUPERIOR -->
+    <header class="cajero-header">
+        <div class="cajero-header-container">
+            <a href="cajero.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="cajero-user-info">
+                <div class="user-tag"><i class="fa-solid fa-cash-register"></i> <span>Caja general</span></div>
+                <a href="cajero.html" class="btn-cajero-logout"><i class="fa-solid fa-arrow-left"></i><span>Volver al pedido</span></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3 COLUMNAS DEL CHECKOUT -->
+    <div class="checkout-grid-layout">
+        
+        <!-- COLUMNA 1: RESUMEN DE LA COMPRA -->
+        <div class="checkout-card">
+            <div>
+                <div class="card-title-header">
+                    <i class="fa-solid fa-receipt"></i>
+                    <h3>Resumen de la compra</h3>
+                </div>
+
+                <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+                    <div class="summary-row">
+                        <span id="pago-cant-productos">Total productos (0)</span>
+                        <span style="color: var(--text-muted);">importe con IGV</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>OP. GRAVABLE</span>
+                        <span id="pago-resumen-subtotal">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span id="pago-igv-pct">IGV 18%</span>
+                        <span id="pago-resumen-igv">S/ 0.00</span>
+                    </div>
+                    <div class="summary-row total-row" style="border-top: 1.5px solid var(--border-pink); padding-top: 12px; margin-top: 6px;">
+                        <span>TOTAL A PAGAR</span>
+                        <span id="pago-resumen-total">S/ 0.00</span>
+                    </div>
+                </div>
+
+                <div class="checkout-summary-decoration" style="text-align: center; padding: 25px 0;">
+                    <img src="lastulas.jpg" alt="Las Tulas" class="brand-mark-small" width="56" height="56">
+                    <p style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Verifica el total antes de continuar</p>
+                </div>
+            </div>
+
+            <a href="cajero.html" class="btn-cajero-logout" style="border: 1.5px solid #eed6e2; color: var(--text-muted); justify-content: center; padding: 10px; border-radius: 10px;">
+                <i class="fa-solid fa-circle-xmark"></i> CANCELAR
+            </a>
+        </div>
+
+        <!-- COLUMNA 2: SELECCIÓN DE MÉTODO DE PAGO Y TECLADO -->
+        <div class="checkout-card checkout-payment-card">
+            <div>
+                <div class="card-title-header">
+                    <i class="fa-solid fa-money-bill-wave"></i>
+                    <h3>Ir a pagar</h3>
+                </div>
+                <p class="payment-intro">Elige cómo pagará el cliente.</p>
+
+                <!-- BOTONES DE MÉTODOS DE PAGO -->
+                <div class="payment-methods-grid" role="group" aria-label="Método de pago">
+                    <button type="button" class="pay-method-btn active" data-metodo-pago="EFECTIVO" aria-pressed="true" onclick="seleccionarMetodoPago('EFECTIVO', this)">
+                        <span class="check-radio" aria-hidden="true"></span>
+                        <i class="fa-solid fa-money-bill-1-wave pay-icon-box" aria-hidden="true"></i>
+                        <span class="pay-method-name">Efectivo</span>
+                    </button>
+                    <button type="button" class="pay-method-btn" data-metodo-pago="POS" aria-pressed="false" onclick="seleccionarMetodoPago('POS', this)">
+                        <span class="check-radio" aria-hidden="true"></span>
+                        <i class="fa-solid fa-credit-card pay-icon-box" aria-hidden="true"></i>
+                        <span class="pay-method-name">POS</span>
+                    </button>
+                    <button type="button" class="pay-method-btn" data-metodo-pago="YAPE" aria-pressed="false" onclick="seleccionarMetodoPago('YAPE', this)">
+                        <span class="check-radio" aria-hidden="true"></span>
+                        <img src="yape.jpg" alt="" width="32" height="32" class="pay-yape-img">
+                        <span class="pay-method-name">Yape</span>
+                    </button>
+                    <p class="payment-group-label">O combina tu pago</p>
+                    <button type="button" class="pay-method-btn pay-method-btn--combined" data-metodo-pago="EFECTIVO_POS" aria-pressed="false" onclick="seleccionarMetodoPago('EFECTIVO_POS', this)">
+                        <span class="check-radio" aria-hidden="true"></span>
+                        <span class="pay-combination-icons" aria-hidden="true">
+                            <i class="fa-solid fa-money-bill-1-wave"></i><span>+</span><i class="fa-solid fa-credit-card"></i>
+                        </span>
+                        <span class="pay-method-name">Efectivo + <strong>POS</strong></span>
+                    </button>
+                    <button type="button" class="pay-method-btn pay-method-btn--combined" data-metodo-pago="EFECTIVO_YAPE" aria-pressed="false" onclick="seleccionarMetodoPago('EFECTIVO_YAPE', this)">
+                        <span class="check-radio" aria-hidden="true"></span>
+                        <span class="pay-combination-icons" aria-hidden="true">
+                            <i class="fa-solid fa-money-bill-1-wave"></i><span>+</span><img src="yape.jpg" alt="" width="28" height="28" class="pay-yape-img">
+                        </span>
+                        <span class="pay-method-name">Efectivo + <strong>Yape</strong></span>
+                    </button>
+                </div>
+
+                <!-- BANNER DINÁMICO -->
+                <div class="split-pay-banner" id="pago-banner-info" role="status" aria-live="polite" aria-atomic="true">
+                    <strong>Pago en efectivo.</strong>
+                    Ingresa el dinero recibido para calcular el vuelto.
+                </div>
+
+                <!-- CAMPOS DE MONTO COMBINADO -->
+                <div class="split-inputs-grid" id="contenedor-desglose-pago">
+                    <div class="split-card-input" id="pago-campo-efectivo">
+                        <label for="input-monto-efectivo">Efectivo recibido (S/)</label>
+                        <input type="number" inputmode="decimal" min="0" step="0.01" id="input-monto-efectivo" class="split-num-input" value="0.00" aria-describedby="val-vuelto-calculado" oninput="calcularVueltoYMontos('efectivo')">
+                        <small class="payment-field-hint"><strong id="val-vuelto-calculado" role="status" aria-live="polite" aria-atomic="true">Vuelto: S/ 0.00</strong></small>
+                    </div>
+                    <div class="payment-split-plus" id="pago-separador-montos" aria-hidden="true" hidden>+</div>
+                    <div class="split-card-input" id="pago-campo-digital" hidden>
+                        <label for="input-monto-digital" id="label-digital-monto">Monto en POS (S/)</label>
+                        <input type="number" inputmode="decimal" min="0" step="0.01" id="input-monto-digital" class="split-num-input" value="0.00" aria-describedby="pago-digital-ayuda" oninput="calcularVueltoYMontos('digital')" disabled>
+                        <small class="payment-field-hint" id="pago-digital-ayuda">Monto a cobrar</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TECLADO NUMÉRICO -->
+            <div class="checkout-quick-keypad">
+                <label style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted);">TECLADO RÁPIDO</label>
+                <div class="keypad-grid-layout">
+                    <button class="keypad-btn" onclick="teclearNumeroPago('7')">7</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('8')">8</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('9')">9</button>
+                    <button class="keypad-btn" aria-label="Borrar último dígito" onclick="borrarDigitoPago()"><i class="fa-solid fa-delete-left"></i></button>
+
+                    <button class="keypad-btn" onclick="teclearNumeroPago('4')">4</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('5')">5</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('6')">6</button>
+                    <button class="keypad-btn" aria-label="Limpiar monto" onclick="limpiarTecladoPago()">C</button>
+
+                    <button class="keypad-btn" onclick="teclearNumeroPago('1')">1</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('2')">2</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('3')">3</button>
+                    <button class="keypad-btn action-btn" onclick="confirmarMontoIngresado()">
+                        <i class="fa-solid fa-check"></i> CONFIRMAR
+                    </button>
+
+                    <button class="keypad-btn" style="grid-column: span 2;" onclick="teclearNumeroPago('0')">0</button>
+                    <button class="keypad-btn" onclick="teclearNumeroPago('.')">.</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- COLUMNA 3: COMPROBANTE Y DATOS DEL CLIENTE -->
+        <div class="checkout-card">
+            <div>
+                <div class="card-title-header">
+                    <i class="fa-solid fa-file-invoice"></i>
+                    <h3>Tipo de comprobante</h3>
+                </div>
+
+                <!-- RADIO BUTTONS -->
+                <div class="voucher-radio-list">
+                    <label class="voucher-radio-option" onclick="seleccionarComprobante('BOLETA_SIMPLE', this)">
+                        <input type="radio" name="tipoComprobanteRadio" value="Boleta simple">
+                        <div>
+                            <strong style="font-size: 0.85rem; display:block;">Boleta simple</strong>
+                            <small style="color: var(--text-muted); font-size: 0.72rem;">Comprobante sin identificación obligatoria.</small>
+                        </div>
+                    </label>
+
+                    <label class="voucher-radio-option" onclick="seleccionarComprobante('BOLETA_DNI', this)">
+                        <input type="radio" name="tipoComprobanteRadio" value="Boleta con DNI">
+                        <div>
+                            <strong style="font-size: 0.85rem; display:block;">Boleta con DNI</strong>
+                            <small style="color: var(--text-muted); font-size: 0.72rem;">Comprobante con DNI del cliente.</small>
+                        </div>
+                    </label>
+
+                    <label class="voucher-radio-option" onclick="seleccionarComprobante('FACTURA', this)">
+                        <input type="radio" name="tipoComprobanteRadio" value="Factura">
+                        <div>
+                            <strong style="font-size: 0.85rem; display:block;">Factura</strong>
+                            <small style="color: var(--text-muted); font-size: 0.72rem;">Comprobante con RUC y Razón Social.</small>
+                        </div>
+                    </label>
+                    <label class="voucher-radio-option active" onclick="seleccionarComprobante('NOTA_VENTA', this)">
+                        <input type="radio" name="tipoComprobanteRadio" value="NOTA_VENTA" checked>
+                        <div>
+                            <strong style="font-size: 0.85rem; display:block;">Nota de venta</strong>
+                            <small style="color: var(--text-muted); font-size: 0.72rem;">Documento interno. Sin emisión a SUNAT.</small>
+                        </div>
+                    </label>
+                </div>
+
+                <!-- DATOS DEL CLIENTE EDITABLES -->
+                <div style="margin-top: 15px;">
+                    <div class="card-title-header" style="margin-bottom: 8px;">
+                        <i class="fa-solid fa-user"></i>
+                        <h4 style="font-size: 0.9rem; font-weight: 800; color: var(--primary-pink);">DATOS DEL CLIENTE</h4>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <div>
+                            <label id="label-nombre-cliente" for="cliente-nombre-input" style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 3px;">Nombre (opcional)</label>
+                            <input type="text" id="cliente-nombre-input" aria-describedby="documento-estado-texto" class="form-input" placeholder="Nombre del cliente" autocomplete="off">
+                        </div>
+                        <div id="cliente-documento-campo" hidden>
+                            <label style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); display: block; margin-bottom: 3px;" id="label-documento-cliente" for="cliente-doc-input">DNI (8 dígitos) o CE (9 a 12 dígitos)</label>
+                            <input type="text" id="cliente-doc-input" aria-describedby="documento-estado-texto" inputmode="numeric" class="form-input" placeholder="DNI o documento de extranjería" maxlength="12" autocomplete="off">
+                            <div id="estado-busqueda-documento" class="documento-estado" hidden>
+                                <i id="documento-estado-icono" class="fa-solid fa-circle-info" aria-hidden="true"></i>
+                                <span id="documento-estado-texto" role="status" aria-live="polite" aria-atomic="true"></span>
+                                <button id="documento-reintentar" class="documento-reintentar" type="button" onclick="buscarDocumentoCliente()" hidden><i class="fa-solid fa-rotate-right" aria-hidden="true"></i> Reintentar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button class="btn-finalize-sale" onclick="finalizarVentaComprobante()">
+                <span>Registrar venta</span>
+                <i class="fa-solid fa-arrow-right"></i>
+            </button>
+        </div>
+    </div>
+
+    <div id="receipt-preview-modal" class="receipt-preview-overlay" role="dialog" aria-modal="true"
+         aria-labelledby="receipt-preview-heading" aria-hidden="true">
+        <div class="receipt-preview-dialog">
+            <div class="receipt-preview-actions">
+                <span id="receipt-preview-heading">Cliente y cocina · 2 comprobantes</span>
+                <button type="button" class="receipt-action-button" onclick="imprimirVistaPreviaComprobante()">
+                    <i class="fa-solid fa-print" aria-hidden="true"></i> Imprimir ambos
+                </button>
+                <button type="button" class="receipt-action-button receipt-action-primary" onclick="cerrarVistaPreviaComprobante()">
+                    Nueva venta
+                </button>
+            </div>
+            <div class="receipt-tickets">
+            <article id="receipt-ticket" class="receipt-ticket" aria-label="Comprobante del cliente">
+                <header class="receipt-brand">
+                    <img src="lastulas.jpg" alt="Logo Las Tulas">
+                    <div>
+                        <h1>LAS TULAS</h1>
+                        <p>COPIA PARA EL CLIENTE</p>
+                    </div>
+                </header>
+                <hr class="receipt-divider">
+                <h2 id="receipt-preview-title" class="receipt-document-title">BOLETA DE VENTA</h2>
+                <strong id="receipt-number" class="receipt-number"></strong>
+                <div id="receipt-sale-meta" class="receipt-meta"></div>
+                <div id="receipt-customer-section">
+                <hr class="receipt-divider">
+                <h3 class="receipt-section-title">DATOS DEL CLIENTE</h3>
+                <div id="receipt-customer" class="receipt-customer"></div>
+                <hr class="receipt-divider">
+                </div>
+                <table class="receipt-items">
+                    <thead id="receipt-items-head">
+                        <tr><th>N°</th><th>DESCRIPCIÓN</th><th>CANT.</th><th>P. UNIT.</th><th>IMPORTE</th></tr>
+                    </thead>
+                    <tbody id="receipt-items-body"></tbody>
+                </table>
+                <hr class="receipt-divider">
+                <div id="receipt-totals" class="receipt-totals"></div>
+                <hr class="receipt-divider">
+                <h3 id="receipt-payment-title" class="receipt-section-title">DETALLE DEL PAGO</h3>
+                <div id="receipt-payment" class="receipt-payment"></div>
+                <hr class="receipt-divider">
+                <footer class="receipt-thanks">
+                    <div>
+                    ¡Gracias por tu compra!<br>
+                    Vuelve pronto, te esperamos en Las Tulas.
+                    </div>
+                    <p id="receipt-document-notice" class="receipt-document-notice" hidden>Documento interno sin validación de SUNAT. No es comprobante de pago.</p>
+                </footer>
+            </article>
+            <article id="kitchen-ticket" class="receipt-ticket kitchen-ticket" aria-labelledby="kitchen-ticket-title">
+                <header class="kitchen-ticket-header">
+                    <p>LAS TULAS</p>
+                    <h2 id="kitchen-ticket-title">COCINA</h2>
+                    <span>ORDEN DE PREPARACIÓN</span>
+                </header>
+                <strong id="kitchen-number" class="receipt-number"></strong>
+                <div id="kitchen-sale-meta" class="receipt-meta"></div>
+                <hr class="receipt-divider">
+                <h3 class="kitchen-section-title">PRODUCTOS A PREPARAR</h3>
+                <ol id="kitchen-items" class="kitchen-items"></ol>
+                <footer class="kitchen-ticket-footer">COPIA PARA COCINA · USO INTERNO</footer>
+            </article>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Terminal de Cobro</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Usa la base de datos existente. Los secretos se ingresan en Render.
+services:
+  - type: web
+    name: las-tulas
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: prod
+      - key: DECOLECTA_TOKEN
+        sync: false
+      - key: APP_JWT_SECRET
+        sync: false
+      - key: SPRING_DATASOURCE_URL
+        sync: false
+      - key: SPRING_DATASOURCE_USERNAME
+        sync: false
+      - key: SPRING_DATASOURCE_PASSWORD
+        sync: false

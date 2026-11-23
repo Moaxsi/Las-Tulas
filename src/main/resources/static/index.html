@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Las Tulas | Acceso al negocio</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="login-screen-body access-page">
+    <main class="access-shell">
+        <section class="access-brand" aria-labelledby="access-title">
+            <div class="access-brand-copy">
+                <p class="access-eyebrow">Gestión de ventas</p>
+                <h1 id="access-title">LAS TULAS</h1>
+                <p>Controla cada venta y administra tu negocio con claridad.</p>
+            </div>
+            <img src="lastulas.jpg" alt="Las Tulas" class="access-logo" width="180" height="180" fetchpriority="high">
+        </section>
+        <section class="access-workspace" aria-labelledby="access-workspace-title">
+            <h2 id="access-workspace-title" class="sr-only">Elige tu área e ingresa con tu PIN</h2>
+            <div id="aviso-sesion" class="access-notice" role="status" style="display:none;"></div>
+            <div class="access-options">
+                <button type="button" class="access-option" onclick="abrirPinPad('ADMINISTRADOR')" aria-haspopup="dialog">
+                    <span class="access-option-copy"><span class="access-option-kicker">Gestión del negocio</span><strong>Administrador</strong><span>Inventario, reportes y usuarios en un solo lugar.</span></span>
+                </button>
+                <button type="button" class="access-option" onclick="abrirPinPad('CAJERO')" aria-haspopup="dialog">
+                    <span class="access-option-copy"><span class="access-option-kicker">Punto de venta</span><strong>Cajero</strong><span>Registra pedidos y atiende cada venta.</span></span>
+                </button>
+            </div>
+        </section>
+    </main>
+    <!-- MODAL TECLADO PIN -->
+    <div id="pinpad-modal" class="pinpad-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pinpad-title" aria-hidden="true">
+        <form class="pinpad-card" id="pin-form" onsubmit="event.preventDefault(); validarPin();">
+            <div class="pinpad-header-badge">
+                <img src="lastulas.jpg" alt="Las Tulas" width="70" height="70" class="pinpad-logo">
+            </div>
+            <h2 id="pinpad-title">Administrador</h2>
+            <p id="pinpad-description">Ingresa tu PIN</p>
+
+            <label for="pin-input" class="sr-only">PIN personal</label>
+            <div class="pin-display-wrapper">
+                <input type="password" id="pin-input" class="pin-display-input" name="password" inputmode="none" pattern="[0-9]*" placeholder="Ingresa tu PIN" maxlength="10" autocomplete="current-password" aria-describedby="pinpad-description pinpad-error" oninput="actualizarPin(this.value)">
+            </div>
+
+            <p id="pinpad-error" class="inline-form-error" role="alert" hidden></p>
+            <div class="pinpad-grid">
+                <button type="button" class="pin-key" onclick="agregarNumero('1')">1</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('2')">2</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('3')">3</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('4')">4</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('5')">5</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('6')">6</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('7')">7</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('8')">8</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('9')">9</button>
+                <button type="button" class="pin-key pin-key-action" aria-label="Borrar último dígito" onclick="borrarNumero()">Borrar</button>
+                <button type="button" class="pin-key" onclick="agregarNumero('0')">0</button>
+                <button type="submit" id="pin-confirm" class="pin-key pin-key-action btn-confirm">Entrar</button>
+            </div>
+
+            <p class="pinpad-footer-note"><strong>Tu seguridad es lo más importante</strong><br>No compartas tu PIN con nadie.</p>
+            <button type="button" class="btn-cancel" onclick="cerrarPinPad()">Volver</button>
+        </form>
+    </div>
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>

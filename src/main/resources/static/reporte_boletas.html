@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#e0006a">
+    <title>Reporte de Boletas por Cajero - Las Tulas</title>
+    <link rel="stylesheet" href="estilo.css?v=182ac9d0de94">
+    <link rel="stylesheet" href="interfaz.css?v=e287c3dda45c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- HEADER SUPERIOR -->
+    <header class="tulas-header">
+        <div class="header-container">
+            <a href="inventario.html" class="brand-wrapper">
+                <img src="lastulas.jpg" alt="Logo Las Tulas" class="brand-logo-img" width="48" height="48">
+                <span class="brand-title">LAS TULAS</span>
+            </a>
+            <div class="header-user-info">
+                <div class="user-tag"><i class="fa-solid fa-user"></i> <span>Admin</span></div>
+                <a href="index.html" class="btn-header-logout" onclick="cerrarSesion(); return false;"><i class="fa-solid fa-arrow-right-from-bracket"></i> Salir</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- LAYOUT DEL PANEL ADMINISTRADOR -->
+    <div class="layout-wrapper">
+        <aside class="sidebar-nav">
+            <div class="sidebar-profile">
+                <h4>ADMINISTRADOR</h4>
+            </div>
+
+            <ul class="sidebar-menu">
+                <li><a href="inventario.html" class="nav-link-item"><i class="fa-solid fa-house"></i> Inventario</a></li>
+                <li><a href="reporte_boletas.html" class="nav-link-item active"><i class="fa-solid fa-receipt"></i> Reporte de Boletas</a></li>
+                <li><a href="reporte_general.html" class="nav-link-item"><i class="fa-solid fa-chart-line"></i> Reporte General</a></li>
+                <li><a href="cierre_caja.html" class="nav-link-item"><i class="fa-solid fa-vault" aria-hidden="true"></i> Mi caja</a></li>
+                <li><a href="anulacion_boletas.html" class="nav-link-item"><i class="fa-solid fa-file-pen"></i> Anulación de Boletas</a></li>
+                <li><a href="auditoria.html" class="nav-link-item"><i class="fa-solid fa-clipboard-list"></i> Auditoria</a></li>
+                <li><a href="creacion_usuario.html" class="nav-link-item"><i class="fa-solid fa-user-plus"></i> Creación de Usuario</a></li>
+            </ul>
+        </aside>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="main-content">
+            <!-- CABECERA -->
+            <div class="view-header">
+                <div class="view-header-title">
+                    <div>
+                        <h2>REPORTE DE BOLETAS POR CAJERO</h2>
+                        <p>Consulta el detalle de las boletas emitidas por cada cajero.</p>
+                    </div>
+                </div>
+                <button class="btn-cajeros-disponibles" onclick="window.location.href='creacion_usuario.html'">
+                    <i class="fa-solid fa-users"></i> Los cajeros disponibles
+                </button>
+            </div>
+
+            <!-- FILTROS -->
+            <div class="filter-card-bar">
+                <div class="filter-group">
+                    <label for="filtro-reporte-cajero">Buscar por cajero</label>
+                    <select id="filtro-reporte-cajero" class="filter-select" onchange="seleccionarCajaDesdeSelect(this.value)">
+                        <option value="TODOS">Todos los cajeros...</option>
+                        <!-- Las opciones de cada cajero se generan dinámicamente en script.js -->
+                    </select>
+                </div>
+
+                <div class="filter-group">
+                    <span class="filter-group-label">Rango de fechas</span>
+                    <div class="filter-date-range">
+                        <label>Desde<input type="date" id="filtro-fecha-inicio" class="filter-input" onchange="filtrarReporteBoletas()"></label>
+                        <label>Hasta<input type="date" id="filtro-fecha-fin" class="filter-input" onchange="filtrarReporteBoletas()"></label>
+                    </div>
+                </div>
+
+                <div class="filter-group">
+                    <label for="filtro-reporte-metodo">Método de pago</label>
+                    <select id="filtro-reporte-metodo" class="filter-select" onchange="filtrarReporteBoletas()">
+                        <option value="TODOS">Todos los métodos</option>
+                        <option value="EFECTIVO">Efectivo</option>
+                        <option value="POS">POS</option>
+                        <option value="YAPE">Yape</option>
+                        <option value="PLIN">Plin</option>
+                        <option value="EFECTIVO_POS">Efectivo + POS</option>
+                        <option value="EFECTIVO_YAPE">Efectivo + Yape</option>
+                        <option value="EFECTIVO_COMBINADO">Efectivo combinado (anterior)</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <section class="reporte-cajeros-dashboard" aria-label="Resumen de ventas por cajero activo">
+                <p id="cajeros-dashboard-estado" class="cajeros-dashboard-estado" role="status" aria-live="polite"></p>
+                <div id="cajeros-cards-grid" class="cajeros-cards-grid" aria-busy="true"></div>
+            </section>
+
+            <!-- TABLA DE DETALLE DE BOLETAS -->
+            <div class="table-data-card" style="margin-top: 25px;">
+                <div class="detalle-boletas-header">
+                    <div>
+                        <h3 id="titulo-caja-seleccionada" style="color: var(--primary-pink); font-size: 1.1rem; font-weight: 800;">
+                            DETALLE DE BOLETAS - TODOS LOS CAJEROS
+                        </h3>
+                        <small id="subtitulo-cajero-seleccionado" style="color: var(--text-muted); font-weight: 600;">
+                            Visualizando todas las boletas emitidas
+                        </small>
+                    </div>
+                </div>
+
+                <div class="table-scroll-region" role="region" aria-label="Tabla desplazable" tabindex="0">
+                    <table class="custom-table sales-summary-table">
+                        <thead>
+                            <tr>
+                                <th>N° Boleta</th>
+                                <th>Fecha</th>
+                                <th>Hora</th>
+                                <th>Método de Pago</th>
+                                <th>Monto (S/)</th>
+                                <th>Estado</th>
+                                <th class="sale-detail-column">Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-reporte-boletas-body">
+                            <!-- Generado por script.js desde PostgreSQL -->
+                        </tbody>
+    </table>
+                </div>
+
+                <div class="table-pagination-footer">
+                    <span id="label-paginacion-reporte-boletas" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">
+                        Mostrando 0 boletas
+                    </span>
+                    <div class="pagination-buttons">
+                        <span id="pagina-reporte-boletas-actual" style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;"></span>
+                        <button type="button" id="btn-pag-reporte-boletas-anterior" class="btn-page">&laquo; Anterior</button>
+                        <button type="button" id="btn-pag-reporte-boletas-siguiente" class="btn-page">Siguiente &raquo;</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REPORTE TOTAL INFERIOR -->
+            <div class="reporte-total-container">
+                <h4 class="reporte-total-title">REPORTE TOTAL (TODAS LAS CAJAS)</h4>
+
+                <div class="reporte-total-grid">
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge pink">
+                            <i class="fa-solid fa-file-invoice"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Total boletas</span>
+                            <strong id="resumen-total-boletas">0</strong>
+                        </div>
+                    </div>
+
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge pink">
+                            <span style="font-weight: 900; font-size: 1.1rem;">S/</span>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Monto total</span>
+                            <strong id="resumen-monto-total">S/ 0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge green">
+                            <i class="fa-solid fa-money-bill-wave"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>Efectivo</span>
+                            <strong id="resumen-total-efectivo">S/ 0.00</strong>
+                        </div>
+                    </div>
+
+                    <div class="reporte-stat-card">
+                        <div class="stat-icon-badge blue">
+                            <i class="fa-solid fa-credit-card"></i>
+                        </div>
+                        <div class="stat-text-col">
+                            <span>P.O.S / Yape</span>
+                            <strong id="resumen-total-pos">S/ 0.00</strong>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <dialog id="sale-detail-dialog" class="sale-detail-dialog" aria-labelledby="sale-detail-title">
+        <div class="modal-content-card sale-detail-panel">
+            <div class="modal-header">
+                <div class="modal-header-icon"><i class="fa-solid fa-receipt" aria-hidden="true"></i></div>
+                <h3 id="sale-detail-title" tabindex="-1">DETALLE DE BOLETA</h3>
+                <button type="button" class="btn-close-modal" aria-label="Cerrar detalle de venta" onclick="cerrarDetalleBoleta()">&times;</button>
+            </div>
+            <div id="sale-detail-content" class="sale-detail-content" aria-live="polite" aria-busy="false"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn-cancel" onclick="cerrarDetalleBoleta()">Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- FOOTER -->
+    <footer class="tulas-footer">
+        <p>&copy; 2026 LAS TULAS ICA | Heladería & Waffles Artesanales</p>
+    </footer>
+
+    <script src="script.js?v=d4b8f06803a4"></script>
+    <script src="interfaz.js?v=6320f2e52796"></script>
+</body>
+</html>
